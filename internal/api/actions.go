@@ -3,25 +3,26 @@ package api
 import (
 	"bytes"
 	"encoding/json"
-	"io"
 	"net/http"
 	"os"
 )
+
+type EmptyObj struct{}
 
 func (a *ArgoApi) postJson(url string, reqRes ...interface{}) error {
 	baseUrl := os.Getenv("ARGOCD_SERVER") + "/api/v1"
 	fullUrl := baseUrl + url
 
-	var dataReader io.Reader = nil
+	var reqData interface{} = EmptyObj{}
 	if len(reqRes) > 0 && reqRes[0] != nil {
-		data, err := json.Marshal(reqRes[0])
-		if err != nil {
-			return err
-		}
-		dataReader = bytes.NewReader(data)
+		reqData = reqRes[0]
+	}
+	data, err := json.Marshal(reqData)
+	if err != nil {
+		return err
 	}
 
-	req, err := http.NewRequest(http.MethodPost, fullUrl, dataReader)
+	req, err := http.NewRequest(http.MethodPost, fullUrl, bytes.NewReader(data))
 	if err != nil {
 		return err
 	}
