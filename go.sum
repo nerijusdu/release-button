@@ -1,5 +1,11 @@
 github.com/joho/godotenv v1.4.0 h1:3l4+N6zfMWnkbPEXKng2o2/MR5mSwTrBih4ZEkkz1lg=
 github.com/joho/godotenv v1.4.0/go.mod h1:f4LDr5Voq0i2e/R5DDNOoa2zzDfwtkZa6DnEwAbqwq4=
+github.com/jonboulle/clockwork v0.2.2/go.mod h1:Pkfl5aHPm1nk2H9h0bjmnJD/BcgbGXUBGnn1kMkgxc8=
 gopkg.in/check.v1 v0.0.0-20161208181325-20d25e280405/go.mod h1:Co6ibVJAznAaIkqp8huTwlJQCZ016jof/cbN4VW5Yz0=
 gopkg.in/yaml.v2 v2.4.0 h1:D8xgwECY7CYvx+Y2n4sBz93Jn9JRvxdiyyo8CTfuKaY=
 gopkg.in/yaml.v2 v2.4.0/go.mod h1:RDklbk79AGWmwhnvt/jBztapEOGDOx6ZbXqjP6csGnQ=
+periph.io/x/conn/v3 v3.6.10 h1:gwU4ssmZkq1D/uz8hU91i/COo2c9DrRaS4PJZBbCd+c=
+periph.io/x/conn/v3 v3.6.10/go.mod h1:UqWNaPMosWmNCwtufoTSTTYhB2wXWsMRAJyo1PlxO4Q=
+periph.io/x/d2xx v0.0.4/go.mod h1:38Euaaj+s6l0faIRHh32a+PrjXvxFTFkPBEQI0TKg34=
+periph.io/x/host/v3 v3.7.2 h1:rCAUxkzy2xrzh18HP2AoVwTL/fEKqmcJ1icsZQGM58Q=
+periph.io/x/host/v3 v3.7.2/go.mod h1:nHMlzkPwmnHyP9Tn0I8FV+e0N3K7TjFXLZkIWzAicog=
