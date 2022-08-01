@@ -38,11 +38,22 @@ func main() {
 	fmt.Println("Waiting for clicks")
 	for range clickChan {
 		fmt.Println("Got click")
-		for _, v := range c.Apps {
-			err = argoApi.Sync(v)
-			if err != nil {
-				panic(err)
+		apps, err := argoApi.GetApps(c.Selectors, false)
+		if err != nil {
+			panic(err)
+		}
+
+		for _, app := range apps.Items {
+			if app.Status.Sync.Status == "OutOfSync" {
+				fmt.Println(app.Metadata.Name + " is out of sync")
+				// argoApi.Sync(app.Metadata.Name)
+				for k, v := range app.Metadata.Labels {
+					fmt.Println(k + ": " + v)
+				}
+
+				fmt.Println("")
 			}
 		}
+		fmt.Println("Done processing click")
 	}
 }

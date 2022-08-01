@@ -7,7 +7,8 @@ Make ArgoCD releases with physical button hooked up to Raspberry Pi.
 - [X] Wait for button clicks
 - [ ] Read params from flags
 - [X] Make release on click
-- [ ] Fetch statuses of apps (which needs syncing)
+- [X] Fetch statuses of apps (which needs syncing)
+- [ ] Ignore some projects
 ---
 Future:
 - [ ] Show status with LED

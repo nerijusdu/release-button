@@ -1,3 +1,2 @@
-apps:
-  - test
-  - test2
+selectors:
+  environment: staging

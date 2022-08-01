@@ -1,5 +1,5 @@
 package config
 
 type Config struct {
-	Apps []string `yaml:"apps"`
+	Selectors map[string]string `yaml:"selectors"`
 }
