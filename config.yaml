@@ -1,2 +1,6 @@
 selectors:
   environment: staging
+ignore:
+  - test
+pins:
+  button: GPIO4
