@@ -33,7 +33,7 @@ func (a *ArgoApi) LoadToken(req AuthRequest) error {
 }
 
 func (a *ArgoApi) Sync(name string) error {
-	return a.postJson("/applications/" + name + "/syncaaaaa")
+	return a.postJson("/applications/" + name + "/sync")
 }
 
 func (a *ArgoApi) GetApps(selectors map[string]string, refresh bool) (*Applications, error) {

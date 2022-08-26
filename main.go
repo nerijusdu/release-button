@@ -5,7 +5,7 @@ import (
 	"nerijusdu/release-button/internal/api"
 	"nerijusdu/release-button/internal/config"
 	"nerijusdu/release-button/internal/controls"
-	"nerijusdu/release-button/internal/util"
+	"nerijusdu/release-button/internal/releaser"
 	"os"
 
 	"github.com/joho/godotenv"
@@ -36,39 +36,10 @@ func main() {
 		panic(err)
 	}
 
-	clickChan := make(chan bool)
+	clickChan := make(chan string)
 	ioServer := controls.NewIOServer()
+	releaser := releaser.NewReleaser(argoApi, c)
+
 	go ioServer.Listen(clickChan)
-
-	for range clickChan {
-		fmt.Println("Got click")
-		apps, err := argoApi.GetApps(c.Selectors, false)
-		if err != nil {
-			panic(err) // TODO: handle
-		}
-
-		for _, app := range apps.Items {
-			if app.Status.Sync.Status == "OutOfSync" {
-				fmt.Println(app.Metadata.Name + " is out of sync")
-				if util.Contains(c.Ignore, app.Metadata.Name) {
-					fmt.Println("Skipping")
-					continue
-				}
-
-				err = argoApi.Sync(app.Metadata.Name)
-				if err != nil {
-					fmt.Printf("ERR: Failed to sync %s. Error: %v\n", app.Metadata.Name, err)
-				} else {
-					fmt.Println("Syncing " + app.Metadata.Name)
-				}
-
-				for k, v := range app.Metadata.Labels {
-					fmt.Println(k + ": " + v)
-				}
-
-				fmt.Println("----------------")
-			}
-		}
-		fmt.Println("Done processing click")
-	}
+	releaser.Listen(clickChan)
 }
