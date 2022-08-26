@@ -19,6 +19,9 @@ func init() {
 }
 
 func main() {
+	fmt.Println("Starting")
+	defer fmt.Println("Exiting")
+
 	c, err := config.ReadConfig()
 	if err != nil {
 		panic(err)
@@ -34,14 +37,14 @@ func main() {
 	}
 
 	clickChan := make(chan bool)
-	cont := controls.NewController()
-	go cont.WaitForClick(c.Pins["button"], clickChan)
-	fmt.Println("Waiting for clicks")
+	ioServer := controls.NewIOServer()
+	go ioServer.Listen(clickChan)
+
 	for range clickChan {
 		fmt.Println("Got click")
 		apps, err := argoApi.GetApps(c.Selectors, false)
 		if err != nil {
-			panic(err)
+			panic(err) // TODO: handle
 		}
 
 		for _, app := range apps.Items {
