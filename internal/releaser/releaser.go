@@ -28,26 +28,42 @@ func NewReleaser(
 }
 
 func (r *Releaser) Listen(clickChan <-chan string) {
-	util.Schedule(5*time.Second, func() { 
-		err := r.ChcekStatus()
-		if err != nil {
-			fmt.Printf("ERR: failed to check status. %v\n", err)
-		}
-	})
+	util.Schedule(
+		time.Duration(r.configs.RefreshInterval)*time.Second, 
+		func() { 
+			inSync, err := r.IsInSync()
+			if err != nil {
+				fmt.Printf("ERR: failed to check status. %v\n", err)
+			}
+			if inSync {
+				err = r.ioController.TurnOnLed("button_led")
+				if err != nil {
+					fmt.Printf("ERR: turn on led. %v\n", err)
+				}
+			}
+		},
+	)
 
 	for button := range clickChan {
 		switch button {
 		case "release":
-			r.Sync()
+			err := r.Sync()
+			if err != nil {
+				fmt.Printf("ERR: failed to sync. %v", err)
+			}
 		}
 	}
 }
 
-func (r *Releaser) Sync() {
+func (r *Releaser) Sync() error {
 	apps, err := r.argoApi.GetApps(r.configs.Selectors, false)
 	if err != nil {
-		fmt.Printf("ERR: Failed to get apps: Error: %v\n", err)
-		return
+		return err
+	}
+
+	err = r.ioController.BlinkLed("button_led", true)
+	if err != nil {
+		return err
 	}
 
 	for _, app := range apps.Items {
@@ -66,19 +82,39 @@ func (r *Releaser) Sync() {
 			}
 		}
 	}
+
+	util.ScheduleControlled(
+		5 * time.Second,
+		func() bool {
+			inSync, err := r.IsInSync()
+			if err != nil {
+				fmt.Printf("ERR: failed to check status. %v\n", err)
+			}
+			if inSync {
+				err = r.ioController.BlinkLed("button_led", false)
+				if err != nil {
+					fmt.Printf("ERR: failed to turn off led. %v", err)
+				}
+				return true
+			}
+			return false
+		},
+	)
+
+	return nil
 }
 
-func (r *Releaser) ChcekStatus() error {
+func (r *Releaser) IsInSync() (bool, error) {
 	apps, err := r.argoApi.GetApps(r.configs.Selectors, true)
 	if err != nil {
-		return err
+		return true, err
 	}
 
 	for _, app := range apps.Items {
 		if app.Status.Sync.Status == "OutOfSync" {
-			return r.ioController.TurnOnLed("button_led")
+			return false, nil
 		}
 	}
 
-	return r.ioController.TurnOffLed("button_led")
+	return true, nil
 }

@@ -30,3 +30,22 @@ func Schedule(interval time.Duration, handler func()) func() {
 		close(quit)
 	}
 }
+
+func ScheduleControlled(interval time.Duration, handler func() bool) {
+	ticker := time.NewTicker(interval)
+	quit := make(chan struct{})
+	go func() {
+		for {
+			select {
+			case <- ticker.C:
+				stop := handler()
+				if stop {
+					close(quit)
+				}
+			case <- quit:
+				ticker.Stop()
+				return
+			}
+		}
+	}()
+}

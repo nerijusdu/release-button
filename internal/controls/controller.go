@@ -2,6 +2,7 @@ package controls
 
 import (
 	"net/http"
+	"strconv"
 )
 
 type IOController struct {
@@ -21,5 +22,14 @@ func (c *IOController) TurnOnLed(id string) error {
 
 func (c *IOController) TurnOffLed(id string) error {
 	_, err := http.Post(c.url+"/io/led/"+id+"/off", "application/json", nil)
+	return err
+}
+
+func (c *IOController) BlinkLed(id string, onOff bool) error {
+	_, err := http.Post(
+		c.url+"/io/led/"+id+"/blink/"+strconv.FormatBool(onOff), 
+		"application/json", 
+		nil,
+	)
 	return err
 }

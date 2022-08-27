@@ -2,5 +2,4 @@ selectors:
   environment: staging
 ignore:
   - test
-pins:
-  button: GPIO4
+refreshInterval: 60
