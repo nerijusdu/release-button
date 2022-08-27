@@ -19,7 +19,7 @@ def led_off_route(id):
   releaser_io.led_off(id)
   return ""
 
-@app.route("/io/led/<id>/blink/<onoff>")
+@app.route("/io/led/<id>/blink/<onoff>", methods=['POST'])
 def led_blink_route(id, onoff):
   releaser_io.led_blink(id, onoff.lower() == "true")
   return ""

@@ -40,7 +40,7 @@ func (r *Releaser) Listen(clickChan <-chan string) {
 			if err != nil {
 				fmt.Printf("ERR: failed to check status. %v\n", err)
 			}
-			if inSync {
+			if !inSync {
 				err = r.ioController.TurnOnLed("button_led")
 				if err != nil {
 					fmt.Printf("ERR: turn on led. %v\n", err)
