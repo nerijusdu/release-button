@@ -13,6 +13,7 @@ type Releaser struct {
 	argoApi *api.ArgoApi
 	ioController *controls.IOController
 	configs *config.Config
+	isSyncing bool
 }
 
 func NewReleaser(
@@ -31,6 +32,10 @@ func (r *Releaser) Listen(clickChan <-chan string) {
 	util.Schedule(
 		time.Duration(r.configs.RefreshInterval)*time.Second, 
 		func() { 
+			if (r.isSyncing) {
+				return
+			}
+
 			inSync, err := r.IsInSync()
 			if err != nil {
 				fmt.Printf("ERR: failed to check status. %v\n", err)
@@ -56,6 +61,7 @@ func (r *Releaser) Listen(clickChan <-chan string) {
 }
 
 func (r *Releaser) Sync() error {
+
 	apps, err := r.argoApi.GetApps(r.configs.Selectors, false)
 	if err != nil {
 		return err
@@ -65,6 +71,8 @@ func (r *Releaser) Sync() error {
 	if err != nil {
 		return err
 	}
+
+	r.isSyncing = true
 
 	for _, app := range apps.Items {
 		if app.Status.Sync.Status == "OutOfSync" {
@@ -95,6 +103,7 @@ func (r *Releaser) Sync() error {
 				if err != nil {
 					fmt.Printf("ERR: failed to turn off led. %v", err)
 				}
+				r.isSyncing = false
 				return true
 			}
 			return false
