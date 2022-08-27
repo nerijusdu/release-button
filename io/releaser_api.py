@@ -10,12 +10,12 @@ def health():
 
 
 @app.route("/io/led/<id>/on", methods=['POST'])
-def led_on(id):
+def led_on_route(id):
   releaser_io.led_on(id)
   return ""
 
 @app.route("/io/led/<id>/off", methods=['POST'])
-def led_on(id):
+def led_off_route(id):
   releaser_io.led_off(id)
   return ""
 

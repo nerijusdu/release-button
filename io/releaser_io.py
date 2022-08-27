@@ -5,28 +5,38 @@ import os
 dummy_io = os.environ.get('DUMMY_IO') == 'true'
 pinMap = {
   "release": 4,
-  "button_led": 12
+  "button_led": 18
 }
+ioMap = {}
 
-def listen_to_button(pin, listener):
+if dummy_io == False:
+  button_led = LED(pinMap['button_led'])
+  button = Button(pinMap['release'])
+  ioMap = {
+    "release": button,
+    "button_led": button_led
+  }
+
+
+def listen_to_button(id, listener):
   if dummy_io:
     return
 
-  button = Button(pinMap[pin])
-  button.when_pressed = listener
+  if id in ioMap.keys():
+    ioMap[id].when_pressed = listener
 
 
-def led_on(pin):
+def led_on(id):
   if dummy_io:
     return
 
-  led = LED(pinMap[pin])
-  led.on()
+  if id in ioMap.keys():
+    ioMap[id].on()
 
 
-def led_off(pin):
+def led_off(id):
   if dummy_io:
     return
 
-  led = LED(pinMap[pin])
-  led.off()
+  if id in ioMap.keys():
+    ioMap[id].off()

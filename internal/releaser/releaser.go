@@ -29,8 +29,10 @@ func NewReleaser(
 
 func (r *Releaser) Listen(clickChan <-chan string) {
 	util.Schedule(5*time.Second, func() { 
-		err := r.ChcekStatus() 
-		fmt.Printf("ERR: failed to check status. %v\n", err)
+		err := r.ChcekStatus()
+		if err != nil {
+			fmt.Printf("ERR: failed to check status. %v\n", err)
+		}
 	})
 
 	for button := range clickChan {
