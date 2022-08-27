@@ -1,5 +1,7 @@
+from time import sleep
 from gpiozero import Button
 from gpiozero import LED
+import multiprocessing
 import os
 
 dummy_io = os.environ.get('DUMMY_IO') == 'true'
@@ -39,4 +41,33 @@ def led_off(id):
     return
 
   if id in ioMap.keys():
+    ioMap[id].off()
+
+def _led_blink(id):
+  if id not in ioMap.keys():
+    return
+
+  while True:
+    ioMap[id].on()
+    sleep(1)
+    ioMap[id].off()
+    sleep(1)
+
+thread = None
+
+def led_blink(id, onoff):
+  global thread
+
+  if onoff == True:
+    if thread != None:
+      return
+
+    thread = multiprocessing.Process(target=_led_blink, args=(id,))
+    thread.start()
+  else:
+    if thread == None:
+      return
+
+    thread.terminate()
+    thread = None
     ioMap[id].off()

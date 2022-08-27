@@ -19,5 +19,10 @@ def led_off_route(id):
   releaser_io.led_off(id)
   return ""
 
+@app.route("/io/led/<id>/blink/<onoff>")
+def led_blink_route(id, onoff):
+  releaser_io.led_blink(id, onoff.lower() == "true")
+  return ""
+
 def start():
   app.run(host='0.0.0.0', port=6968)
