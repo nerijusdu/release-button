@@ -8,14 +8,14 @@ import (
 	"github.com/go-chi/chi/v5/middleware"
 )
 
-type IOServer struct {
+type IOListener struct {
 }
 
-func NewIOServer() *IOServer {
-	return &IOServer{}
+func NewIOListener() *IOListener {
+	return &IOListener{}
 }
 
-func (c *IOServer) Listen(clickChan chan<- string) {
+func (c *IOListener) Listen(clickChan chan<- string) {
 	fmt.Println("Listening to IO requests")
 
 	r := chi.NewRouter()

@@ -37,9 +37,10 @@ func main() {
 	}
 
 	clickChan := make(chan string)
-	ioServer := controls.NewIOServer()
-	releaser := releaser.NewReleaser(argoApi, c)
+	ioListener := controls.NewIOListener()
+	ioController := controls.NewIOController()
+	releaser := releaser.NewReleaser(argoApi, ioController, c)
 
-	go ioServer.Listen(clickChan)
+	go ioListener.Listen(clickChan)
 	releaser.Listen(clickChan)
 }
