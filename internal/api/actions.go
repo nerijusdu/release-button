@@ -72,11 +72,9 @@ func (a *ArgoApi) getJson(url string, reqRes ...interface{}) error {
 }
 
 func (a *ArgoApi) addAuthCookies(req *http.Request) {
-	if a.fToken != "" {
-		req.AddCookie(&http.Cookie{
-			Name:  "_forward_auth",
-			Value: a.fToken,
-		})
+	if a.gToken != "" {
+		req.Header.Add("Application", a.gToken)
+		req.Header.Add("X-User", a.gUser)
 	}
 	if a.token != "" {
 		req.AddCookie(&http.Cookie{
@@ -88,11 +86,6 @@ func (a *ArgoApi) addAuthCookies(req *http.Request) {
 
 func parseJson(r *http.Response, obj interface{}) error {
 	defer r.Body.Close()
-	err := json.NewDecoder(r.Body).Decode(obj)
-	if err == nil {
-		return nil
-	}
-
 	bodyBytes, err2 := io.ReadAll(r.Body)
 	if err2 != nil {
 		return err2
@@ -100,5 +93,11 @@ func parseJson(r *http.Response, obj interface{}) error {
 
 	bodyString := string(bodyBytes)
 	fmt.Println(bodyString)
+
+	err := json.Unmarshal(bodyBytes, obj)
+	if err == nil {
+		return nil
+	}
+
 	return err
 }

@@ -11,13 +11,15 @@ import (
 type ArgoApi struct {
 	token   string
 	baseUrl string
-	fToken  string
+	gToken  string
+	gUser   string
 }
 
 func NewArgoApi() *ArgoApi {
 	return &ArgoApi{
 		baseUrl: os.Getenv("ARGOCD_SERVER") + "/api/v1",
-		fToken:  os.Getenv("FORWARDED_TOKEN"),
+		gToken:  os.Getenv("AUTH_TOKEN"),
+		gUser:   os.Getenv("AUTH_USER"),
 	}
 }
 

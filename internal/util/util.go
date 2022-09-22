@@ -11,15 +11,25 @@ func Contains[T comparable](elems []T, v T) bool {
 	return false
 }
 
+func Find[T comparable](elems []T, p func(item T) bool) (T, bool) {
+	var result T
+	for _, v := range elems {
+		if p(v) {
+			return v, true
+		}
+	}
+	return result, false
+}
+
 func Schedule(interval time.Duration, handler func()) func() {
 	ticker := time.NewTicker(interval)
 	quit := make(chan struct{})
 	go func() {
 		for {
 			select {
-			case <- ticker.C:
+			case <-ticker.C:
 				handler()
-			case <- quit:
+			case <-quit:
 				ticker.Stop()
 				return
 			}
@@ -37,15 +47,16 @@ func ScheduleControlled(interval time.Duration, handler func() bool) {
 	go func() {
 		for {
 			select {
-			case <- ticker.C:
+			case <-ticker.C:
 				stop := handler()
 				if stop {
 					close(quit)
 				}
-			case <- quit:
+			case <-quit:
 				ticker.Stop()
 				return
 			}
 		}
 	}()
 }
+
