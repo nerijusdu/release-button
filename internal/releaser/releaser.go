@@ -10,14 +10,14 @@ import (
 )
 
 type Releaser struct {
-	argoApi      *api.ArgoApi
+	argoApi      api.IArgoApi
 	ioController *controls.IOController
 	configs      *config.Config
 	isSyncing    bool
 }
 
 func NewReleaser(
-	argoApi *api.ArgoApi,
+	argoApi api.IArgoApi,
 	ioController *controls.IOController,
 	configs *config.Config,
 ) *Releaser {

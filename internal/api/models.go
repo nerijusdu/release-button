@@ -14,18 +14,29 @@ type Applications struct {
 }
 
 type Application struct {
-	Metadata struct {
-		Name      string            `json:"name"`
-		Namespace string            `json:"namespace"`
-		Labels    map[string]string `json:"labels"`
-	} `json:"metadata"`
-	Status struct {
-		Sync struct {
-			Status   string `json:"status"`
-			Revision string `json:"revision"`
-		} `json:"sync"`
-		Health struct {
-			Status string `json:"status"`
-		} `json:"health"`
-	} `json:"status"`
+	Metadata AppMeta   `json:"metadata"`
+	Status   AppStatus `json:"status"`
+}
+
+type AppMeta struct {
+	Name      string            `json:"name"`
+	Namespace string            `json:"namespace"`
+	Labels    map[string]string `json:"labels"`
+}
+
+type AppStatus struct {
+	Sync   AppStatusSync `json:"sync"`
+	Health struct {
+		Status string `json:"status"`
+	} `json:"health"`
+}
+
+type AppStatusSync struct {
+	Status   string `json:"status"`
+	Revision string `json:"revision"`
+}
+
+type IArgoApi interface {
+	GetApps(selectors map[string]string, refresh bool) (*Applications, error)
+	Sync(name string) error
 }

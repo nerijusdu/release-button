@@ -13,3 +13,7 @@ Make ArgoCD releases with physical button hooked up to Raspberry Pi.
 Future:
 - [ ] Safeguards to prevent accidental releases
 - [ ] Hoop up a screen
+
+
+
+mockgen -source=internal/api/models.go -destination=internal/mocks/argoApi.go -package=mocks IArgoApi
