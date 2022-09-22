@@ -1,5 +1,6 @@
 selectors:
   environment: toolbox
 ignore:
-  - test
-refreshInterval: 60
+  - billo-mobile-api-service-toolbox
+  - billo-analytics-service-toolbox
+refreshInterval: 15

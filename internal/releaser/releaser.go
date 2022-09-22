@@ -10,10 +10,10 @@ import (
 )
 
 type Releaser struct {
-	argoApi *api.ArgoApi
+	argoApi      *api.ArgoApi
 	ioController *controls.IOController
-	configs *config.Config
-	isSyncing bool
+	configs      *config.Config
+	isSyncing    bool
 }
 
 func NewReleaser(
@@ -22,17 +22,17 @@ func NewReleaser(
 	configs *config.Config,
 ) *Releaser {
 	return &Releaser{
-		argoApi: argoApi,
+		argoApi:      argoApi,
 		ioController: ioController,
-		configs: configs,
+		configs:      configs,
 	}
 }
 
 func (r *Releaser) Listen(clickChan <-chan string) {
 	util.Schedule(
-		time.Duration(r.configs.RefreshInterval)*time.Second, 
-		func() { 
-			if (r.isSyncing) {
+		time.Duration(r.configs.RefreshInterval)*time.Second,
+		func() {
+			if r.isSyncing {
 				return
 			}
 
@@ -92,7 +92,7 @@ func (r *Releaser) Sync() error {
 	}
 
 	util.ScheduleControlled(
-		5 * time.Second,
+		5*time.Second,
 		func() bool {
 			inSync, err := r.IsInSync()
 			if err != nil {
@@ -120,7 +120,7 @@ func (r *Releaser) IsInSync() (bool, error) {
 	}
 
 	for _, app := range apps.Items {
-		if app.Status.Sync.Status == "OutOfSync" {
+		if app.Status.Sync.Status == "OutOfSync" && !util.Contains(r.configs.Ignore, app.Metadata.Name) {
 			return false, nil
 		}
 	}
