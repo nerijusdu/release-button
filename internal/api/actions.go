@@ -91,8 +91,10 @@ func parseJson(r *http.Response, obj interface{}) error {
 		return err2
 	}
 
-	bodyString := string(bodyBytes)
-	fmt.Println(bodyString)
+	if r.StatusCode >= 400 {
+		bodyString := string(bodyBytes)
+		fmt.Println(bodyString)
+	}
 
 	err := json.Unmarshal(bodyBytes, obj)
 	if err == nil {
