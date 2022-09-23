@@ -1,4 +1,4 @@
-package api
+package argoApi
 
 import (
 	"bytes"
@@ -7,6 +7,7 @@ import (
 	"io"
 	"net/http"
 	netUrl "net/url"
+	"strings"
 )
 
 type EmptyObj struct{}
@@ -73,6 +74,8 @@ func (a *ArgoApi) getJson(url string, reqRes ...interface{}) error {
 
 func (a *ArgoApi) addAuthCookies(req *http.Request) {
 	if a.gToken != "" {
+		fmt.Println(a.gToken)
+		fmt.Println(a.gUser)
 		req.Header.Add("Application", a.gToken)
 		req.Header.Add("X-User", a.gUser)
 	}
@@ -91,8 +94,8 @@ func parseJson(r *http.Response, obj interface{}) error {
 		return err2
 	}
 
-	if r.StatusCode >= 400 {
-		bodyString := string(bodyBytes)
+	bodyString := string(bodyBytes)
+	if r.StatusCode >= 400 || strings.HasPrefix(bodyString, "<") {
 		fmt.Println(bodyString)
 	}
 

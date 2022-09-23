@@ -3,7 +3,7 @@ import requests
 import os
 import signal
 import sys
-import releaser_api
+import releaser_argoApi
 import releaser_io
 
 load_dotenv()
@@ -21,4 +21,4 @@ def sigintHandler(signal_number, frame):
 signal.signal(signal.SIGINT, sigintHandler)
 # signal.pause()
 
-releaser_api.start()
+releaser_argoApi.start()

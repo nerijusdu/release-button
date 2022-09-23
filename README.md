@@ -16,4 +16,4 @@ Future:
 
 
 
-mockgen -source=internal/api/models.go -destination=internal/mocks/argoApi.go -package=mocks IArgoApi
+mockgen -source=internal/argoApi/models.go -destination=internal/mocks/argoargoApi.go -package=mocks IArgoargoApi

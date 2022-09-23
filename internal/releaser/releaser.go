@@ -2,7 +2,7 @@ package releaser
 
 import (
 	"fmt"
-	"nerijusdu/release-button/internal/api"
+	"nerijusdu/release-button/internal/argoApi"
 	"nerijusdu/release-button/internal/config"
 	"nerijusdu/release-button/internal/controls"
 	"nerijusdu/release-button/internal/util"
@@ -10,19 +10,19 @@ import (
 )
 
 type Releaser struct {
-	argoApi      api.IArgoApi
+	argoApi      argoApi.IArgoApi
 	ioController *controls.IOController
 	configs      *config.Config
 	isSyncing    bool
 }
 
 func NewReleaser(
-	argoApi api.IArgoApi,
+	aApi argoApi.IArgoApi,
 	ioController *controls.IOController,
 	configs *config.Config,
 ) *Releaser {
 	return &Releaser{
-		argoApi:      argoApi,
+		argoApi:      aApi,
 		ioController: ioController,
 		configs:      configs,
 	}

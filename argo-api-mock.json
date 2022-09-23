@@ -1,1 +1,92 @@
-{"openapi":"3.0.0","info":{"title":"Argo","version":"1.0.0"},"servers":[{"url":"http://localhost:8000/api/v1"}],"paths":{"/session":{"post":{"description":"","responses":{"200":{"description":"","content":{"application/json":{}},"headers":{}}}}},"/applications":{"get":{"description":"","responses":{"200":{"description":"","content":{"text/html; charset=utf-8":{}},"headers":{"content-security-policy":{"schema":{"type":"string"},"example":"default-src 'none'"},"x-content-type-options":{"schema":{"type":"string"},"example":"nosniff"}}}}}},"/applications/{name}/sync":{"post":{"description":"","responses":{"200":{"description":"","content":{"text/html; charset=utf-8":{}},"headers":{"content-security-policy":{"schema":{"type":"string"},"example":"default-src 'none'"},"x-content-type-options":{"schema":{"type":"string"},"example":"nosniff"}}}},"parameters":[{"name":"name","in":"path","schema":{"type":"string"},"required":true}]}}}}
+{
+  "openargoApi": "3.0.0",
+  "info": {
+    "title": "Argo",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:8000/argoApi/v1"
+    }
+  ],
+  "paths": {
+    "/session": {
+      "post": {
+        "description": "",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {}
+            },
+            "headers": {}
+          }
+        }
+      }
+    },
+    "/applications": {
+      "get": {
+        "description": "",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "text/html; charset=utf-8": {}
+            },
+            "headers": {
+              "content-security-policy": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "default-src 'none'"
+              },
+              "x-content-type-options": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "nosniff"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/applications/{name}/sync": {
+      "post": {
+        "description": "",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "text/html; charset=utf-8": {}
+            },
+            "headers": {
+              "content-security-policy": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "default-src 'none'"
+              },
+              "x-content-type-options": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "nosniff"
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ]
+      }
+    }
+  }
+}

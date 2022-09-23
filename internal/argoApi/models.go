@@ -1,4 +1,4 @@
-package api
+package argoApi
 
 type AuthRequest struct {
 	Username string `json:"username"`
