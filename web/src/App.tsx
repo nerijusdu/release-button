@@ -1,9 +1,8 @@
-import { Button, TextInput, Text, NumberInput } from '@mantine/core';
+import { Button, TextInput, Text, NumberInput, Container } from '@mantine/core';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { useState } from 'react';
 import { TableSelection } from './TableSelection';
 import { getApps, getConfig, saveConfig } from './api';
-import './App.css';
 
 function App() {
   const [selection, setSelection] = useState<string[]>([]);
@@ -24,7 +23,7 @@ function App() {
   });
 
   return (
-    <div className="App">
+    <Container pt="sm">
       <TextInput
         placeholder="prod"
         label="Environment selector"
@@ -58,7 +57,7 @@ function App() {
       >
         Save
       </Button>
-    </div>
+    </Container>
   );
 }
 
