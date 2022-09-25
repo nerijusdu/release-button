@@ -1,6 +1,8 @@
 selectors:
   environment: toolbox
 ignore:
-  - billo-mobile-argoApi-service-toolbox
-  - billo-analytics-service-toolbox
+- billo-mobile-argoApi-service-toolbox
+- billo-analytics-service-toolbox
+allowed:
+- test1
 refreshInterval: 15

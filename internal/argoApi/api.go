@@ -17,7 +17,7 @@ type ArgoApi struct {
 
 func NewArgoApi() *ArgoApi {
 	return &ArgoApi{
-		baseUrl: os.Getenv("ARGOCD_SERVER") + "/argoApi/v1",
+		baseUrl: os.Getenv("ARGOCD_SERVER") + "/api/v1",
 		gToken:  os.Getenv("AUTH_TOKEN"),
 		gUser:   os.Getenv("AUTH_USER"),
 	}

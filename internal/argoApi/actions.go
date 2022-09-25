@@ -74,8 +74,6 @@ func (a *ArgoApi) getJson(url string, reqRes ...interface{}) error {
 
 func (a *ArgoApi) addAuthCookies(req *http.Request) {
 	if a.gToken != "" {
-		fmt.Println(a.gToken)
-		fmt.Println(a.gUser)
 		req.Header.Add("Application", a.gToken)
 		req.Header.Add("X-User", a.gUser)
 	}

@@ -35,6 +35,9 @@ func TestIsInSyncIsFalse(t *testing.T) {
 	defer ctrl.Finish()
 	apps := &argoApi.Applications{
 		Items: []argoApi.Application{{
+			Metadata: argoApi.AppMeta{
+				Name: "test",
+			},
 			Status: argoApi.AppStatus{
 				Sync: argoApi.AppStatusSync{Status: "OutOfSync"},
 			},
@@ -42,6 +45,7 @@ func TestIsInSyncIsFalse(t *testing.T) {
 	}
 	c := &config.Config{
 		Selectors: map[string]string{"foo": "bar"},
+		Allowed:   []string{"test"},
 	}
 	releaser := &Releaser{
 		argoApi: aApi,
@@ -71,6 +75,34 @@ func TestIsInSyncIsFalseAndIgnored(t *testing.T) {
 	c := &config.Config{
 		Selectors: map[string]string{"foo": "bar"},
 		Ignore:    []string{"test"},
+	}
+	releaser := &Releaser{
+		argoApi: aApi,
+		configs: c,
+	}
+
+	aApi.EXPECT().GetApps(c.Selectors, true).Return(apps, nil)
+
+	r, _ := releaser.IsInSync()
+	assert.Equal(t, true, r)
+}
+
+func TestIsInSyncIsFalseAndNotAllowed(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	aApi := mocks.NewMockIArgoApi(ctrl)
+	defer ctrl.Finish()
+	apps := &argoApi.Applications{
+		Items: []argoApi.Application{{
+			Metadata: argoApi.AppMeta{
+				Name: "test",
+			},
+			Status: argoApi.AppStatus{
+				Sync: argoApi.AppStatusSync{Status: "OutOfSync"},
+			},
+		}},
+	}
+	c := &config.Config{
+		Selectors: map[string]string{"foo": "bar"},
 	}
 	releaser := &Releaser{
 		argoApi: aApi,

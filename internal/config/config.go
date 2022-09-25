@@ -16,3 +16,12 @@ func ReadConfig() (*Config, error) {
 	err = yaml.Unmarshal(file, c)
 	return c, err
 }
+
+func WriteConfig(c Config) error {
+	bytes, err := yaml.Marshal(c)
+	if err != nil {
+		return err
+	}
+	err = ioutil.WriteFile("config.yaml", bytes, 0644)
+	return err
+}

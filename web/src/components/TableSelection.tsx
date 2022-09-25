@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { createStyles, Table, Checkbox, ScrollArea } from '@mantine/core';
 
 const useStyles = createStyles((theme) => ({
@@ -12,17 +11,17 @@ const useStyles = createStyles((theme) => ({
 
 interface TableSelectionProps {
   data: string[];
+  onSelectionChange: (selection: string[]) => void;
+  selection: string[];
 }
 
-export function TableSelection({ data }: TableSelectionProps) {
+export function TableSelection({ data, onSelectionChange, selection }: TableSelectionProps) {
   const { classes, cx } = useStyles();
-  const [selection, setSelection] = useState<string[]>([]);
   const toggleRow = (id: string) =>
-    setSelection((current) =>
-      current.includes(id) ? current.filter((item) => item !== id) : [...current, id]
+    onSelectionChange(
+      selection.includes(id) ? selection.filter((item) => item !== id) : [...selection, id]
     );
-  const toggleAll = () =>
-    setSelection((current) => (current.length === data.length ? [] : data));
+  const toggleAll = () => onSelectionChange(selection.length === data.length ? [] : data);
 
   const rows = data.map((item) => {
     const selected = selection.includes(item);

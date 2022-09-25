@@ -1,12 +1,12 @@
 {
-  "openargoApi": "3.0.0",
+  "openapi": "3.0.0",
   "info": {
     "title": "Argo",
     "version": "1.0.0"
   },
   "servers": [
     {
-      "url": "http://localhost:8000/argoApi/v1"
+      "url": "http://localhost:8000/api/v1"
     }
   ],
   "paths": {
