@@ -77,8 +77,7 @@ func (r *Releaser) Sync() error {
 	for _, app := range apps.Items {
 		if app.Status.Sync.Status == "OutOfSync" {
 			fmt.Println(app.Metadata.Name + " is out of sync")
-			if util.Contains(r.configs.Ignore, app.Metadata.Name) ||
-				!util.Contains(r.configs.Allowed, app.Metadata.Name) {
+			if !util.Contains(r.configs.Allowed, app.Metadata.Name) {
 				fmt.Println("Skipping")
 				continue
 			}
@@ -122,7 +121,6 @@ func (r *Releaser) IsInSync() (bool, error) {
 
 	for _, app := range apps.Items {
 		if app.Status.Sync.Status == "OutOfSync" &&
-			!util.Contains(r.configs.Ignore, app.Metadata.Name) &&
 			util.Contains(r.configs.Allowed, app.Metadata.Name) {
 			return false, nil
 		}

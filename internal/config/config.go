@@ -1,6 +1,7 @@
 package config
 
 import (
+	"fmt"
 	"io/ioutil"
 
 	"gopkg.in/yaml.v2"
@@ -14,7 +15,16 @@ func ReadConfig() (*Config, error) {
 
 	c := new(Config)
 	err = yaml.Unmarshal(file, c)
-	return c, err
+	if err != nil {
+		return nil, err
+	}
+
+	if c.Allowed == nil {
+		fmt.Println("No allowed apps found")
+		c.Allowed = make([]string, 0)
+	}
+
+	return c, nil
 }
 
 func WriteConfig(c Config) error {

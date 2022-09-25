@@ -41,14 +41,17 @@ func (a *WebApi) getApiRouter() *chi.Mux {
 	})
 
 	r.Post("/config", func(w http.ResponseWriter, r *http.Request) {
-		data := SaveConfigRequest{}
+		data := config.Config{}
 		err := json.NewDecoder(r.Body).Decode(&data)
 		if err != nil {
 			somethingWentWrong(w, err)
 			return
 		}
 
-		a.config.Allowed = data.AllowedApps
+		a.config.Allowed = data.Allowed
+		a.config.Selectors = data.Selectors
+		a.config.RefreshInterval = data.RefreshInterval
+
 		config.WriteConfig(*a.config)
 
 		w.WriteHeader(http.StatusOK)

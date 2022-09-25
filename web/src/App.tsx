@@ -1,22 +1,9 @@
-import { Button } from '@mantine/core';
+import { Button, TextInput, Text, NumberInput } from '@mantine/core';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { useState } from 'react';
 import './App.css';
 import { TableSelection } from './components/TableSelection';
-
-type Applications = {
-  items: Array<{
-    metadata: { name: string }
-  }>;
-}
-
-type SaveConfigRequest = {
-  allowedApps: string[];
-}
-
-type Config = {
-  allowed: string[];
-}
+import { Applications, Config } from './types';
 
 const apiUrl = 'http://localhost:6970';
 
@@ -28,18 +15,23 @@ const getConfig = () => fetch(apiUrl + '/api/config')
   .then(x => x.json())
   .then(x => x as Config);
 
-const saveConfig = (data: SaveConfigRequest) => fetch(apiUrl + '/api/config', {
+const saveConfig = (data: Config) => fetch(apiUrl + '/api/config', {
   method: 'POST',
   body: JSON.stringify(data)
 });
 
 function App() {
   const [selection, setSelection] = useState<string[]>([]);
+  const [envSelector, setEnvSelector] = useState('');
+  const [refreshInterval, setRefreshInterval] = useState(60);
+
   const { data: apps } = useQuery(['apps'], getApps);
   useQuery(['config'], getConfig, {
     onSuccess: config => {
       setSelection(config?.allowed ?? []);
-    }
+      setEnvSelector(config?.selectors?.environment ?? '');
+      setRefreshInterval(config?.refreshInterval ?? 60);
+    },
   });
 
   const { mutate, isLoading } = useMutation(saveConfig, {
@@ -48,10 +40,34 @@ function App() {
 
   return (
     <div className="App">
+      <TextInput
+        placeholder="prod"
+        label="Environment selector"
+        value={envSelector}
+        onChange={e => setEnvSelector(e.target.value)}
+      />
+
+      <NumberInput
+        label="Refresh interval in seconds"
+        value={refreshInterval}
+        onChange={x => setRefreshInterval(x!)}
+        required
+      />
+      <Text size="sm" pt="sm">
+        Applications to sync
+      </Text>
       <TableSelection data={apps || []} onSelectionChange={setSelection} selection={selection} />
+
       <Button 
-        onClick={() => mutate({ allowedApps: selection })} 
+        onClick={() => mutate({ 
+          allowed: selection,
+          refreshInterval: refreshInterval,
+          selectors: {
+            environment: envSelector,
+          }
+        })} 
         loading={isLoading}
+        mt="sm"
         fullWidth
       >
         Save

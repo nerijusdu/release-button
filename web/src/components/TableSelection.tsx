@@ -47,7 +47,7 @@ export function TableSelection({ data, onSelectionChange, selection }: TableSele
             <th style={{ width: 40 }}>
               <Checkbox
                 onChange={toggleAll}
-                checked={selection.length === data.length}
+                checked={selection.length === data.length && data.length}
                 indeterminate={selection.length > 0 && selection.length !== data.length}
                 transitionDuration={0}
               />
