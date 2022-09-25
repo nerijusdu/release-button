@@ -25,5 +25,6 @@ func (c *IOListener) Listen(clickChan chan<- string) {
 		w.WriteHeader(http.StatusOK)
 	})
 
-	http.ListenAndServe(":6969", r)
+	fmt.Println("Running controls listener on port :6970")
+	http.ListenAndServe(":6970", r)
 }

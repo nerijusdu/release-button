@@ -25,4 +25,5 @@ def led_blink_route(id, onoff):
   return ""
 
 def start():
+  print("Running IO controller on port :6968")
   app.run(host='0.0.0.0', port=6968)
