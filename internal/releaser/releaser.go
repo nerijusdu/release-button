@@ -45,6 +45,11 @@ func (r *Releaser) Listen(clickChan <-chan string) {
 				if err != nil {
 					fmt.Printf("ERR: turn on led. %v\n", err)
 				}
+			} else {
+				err = r.ioController.TurnOffLed("button_led")
+				if err != nil {
+					fmt.Printf("ERR: turn off led. %v\n", err)
+				}
 			}
 		},
 	)
