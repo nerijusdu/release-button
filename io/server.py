@@ -4,6 +4,7 @@ load_dotenv()
 import os
 import signal
 import sys
+import requests
 import releaser_api
 import releaser_io
 

@@ -19,7 +19,7 @@ function App() {
   });
 
   const { mutate, isLoading } = useMutation(saveConfig, {
-    onError: err => alert(`Failed to save: ${err}`)
+    onError: err => console.error('Errrrrrrr', err)
   });
 
   return (

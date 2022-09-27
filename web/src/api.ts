@@ -1,6 +1,6 @@
 import { Applications, Config } from './types';
 
-const apiUrl = 'http://localhost:6969';
+const apiUrl = window.location.host.endsWith(':5173') ? 'http://localhost:6969' : '';
 
 export const getApps = () => fetch(apiUrl + '/api/applications')
   .then(x => x.json())

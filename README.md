@@ -12,8 +12,8 @@ Make ArgoCD releases with physical button hooked up to Raspberry Pi.
 - [X] Safeguards to prevent accidental releases
 ---
 Future:
-- [ ] Hoop up a screen
-
+- [ ] Update refreshInterval wihout restart
+- [X] Localhost in web ui is not correct 
 
 
 ## Notes
