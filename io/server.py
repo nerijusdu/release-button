@@ -1,24 +1,27 @@
 from dotenv import load_dotenv
-import requests
+load_dotenv()
+
 import os
 import signal
 import sys
-import releaser_argoApi
+import releaser_api
 import releaser_io
 
-load_dotenv()
-url = os.environ.get('RELEASER_URL')
-
-def notify_releaser():
+def notify_releaser(url):
   requests.post(url+'/io/buttons/release')
-
-releaser_io.listen_to_button("release", notify_releaser)
 
 def sigintHandler(signal_number, frame):
   print('Exiting')
   sys.exit()
 
-signal.signal(signal.SIGINT, sigintHandler)
-# signal.pause()
+url = os.environ.get('RELEASER_URL')
 
-releaser_argoApi.start()
+releaser_io.listen_to_button("release", notify_releaser)
+
+signal.signal(signal.SIGINT, sigintHandler)
+    # signal.pause()
+
+def run():
+    releaser_api.start()
+
+run()

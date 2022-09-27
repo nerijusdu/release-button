@@ -1,6 +1,4 @@
 from time import sleep
-from gpiozero import Button
-from gpiozero import LED
 import multiprocessing
 import os
 
@@ -12,6 +10,8 @@ pinMap = {
 ioMap = {}
 
 if dummy_io == False:
+  from gpiozero import Button
+  from gpiozero import LED
   button_led = LED(pinMap['button_led'])
   button = Button(pinMap['release'])
   ioMap = {
