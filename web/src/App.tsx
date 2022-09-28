@@ -1,5 +1,5 @@
 import { Button, TextInput, Text, NumberInput, Container } from '@mantine/core';
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import { TableSelection } from './TableSelection';
 import { getApps, getConfig, saveConfig } from './api';
@@ -9,6 +9,7 @@ function App() {
   const [envSelector, setEnvSelector] = useState('');
   const [refreshInterval, setRefreshInterval] = useState(60);
 
+  const queryClient = useQueryClient();
   const { data: apps } = useQuery(['apps'], getApps);
   useQuery(['config'], getConfig, {
     onSuccess: config => {
@@ -19,7 +20,10 @@ function App() {
   });
 
   const { mutate, isLoading } = useMutation(saveConfig, {
-    onError: err => console.error('Errrrrrrr', err)
+    onError: err => console.error('Errrrrrrr', err),
+    onSuccess: () => {
+      queryClient.invalidateQueries(['apps']);
+    }
   });
 
   return (
