@@ -12,7 +12,7 @@ import (
 
 type EmptyObj struct{}
 
-func (a *ArgoApi) postJson(url string, reqRes ...interface{}) error {
+func (a *ArgoApi) postJson(url string, reqRes ...any) error {
 	var reqData interface{} = EmptyObj{}
 	if len(reqRes) > 0 && reqRes[0] != nil {
 		reqData = reqRes[0]
@@ -28,6 +28,23 @@ func (a *ArgoApi) postJson(url string, reqRes ...interface{}) error {
 	}
 	req.Header.Add("Content-Type", "application/json")
 
+	return a.doRequest(req, "POST", url, reqRes)
+}
+
+func (a *ArgoApi) getJson(url string, reqRes ...any) error {
+	req, err := http.NewRequest(http.MethodGet, a.baseUrl+url, nil)
+	if err != nil {
+		return err
+	}
+
+	if len(reqRes) > 0 {
+		req.URL.RawQuery = reqRes[0].(netUrl.Values).Encode()
+	}
+
+	return a.doRequest(req, "GET", url, reqRes)
+}
+
+func (a *ArgoApi) doRequest(req *http.Request, m, url string, reqRes []any) error {
 	a.addAuthCookies(req)
 
 	r, err := http.DefaultClient.Do(req)
@@ -36,33 +53,27 @@ func (a *ArgoApi) postJson(url string, reqRes ...interface{}) error {
 	}
 	defer r.Body.Close()
 
-	fmt.Printf("POST %s - %s\n", url, r.Status)
+	fmt.Printf("%s %s - %s\n", m, url, r.Status)
 	if r.StatusCode > 299 {
+		if r.StatusCode == 401 && !strings.Contains(url, "/session") {
+			fmt.Println("Unauthorized. Re-fetching token.")
+			err := a.LoadToken()
+			if err != nil {
+				return fmt.Errorf("Failed to fetch argo token. %v \n", err)
+			}
+
+			a.isNewToken = true
+			defer func() {
+				a.isNewToken = false
+			}()
+
+			if m == "GET" {
+				return a.getJson(url, reqRes...)
+			}
+			return a.postJson(url, reqRes...)
+		}
+
 		return fmt.Errorf("Request failed with status %s", r.Status)
-	}
-
-	if len(reqRes) > 1 {
-		return parseJson(r, reqRes[1])
-	}
-
-	return nil
-}
-
-func (a *ArgoApi) getJson(url string, reqRes ...interface{}) error {
-	req, err := http.NewRequest(http.MethodGet, a.baseUrl+url, nil)
-	if err != nil {
-		return err
-	}
-
-	a.addAuthCookies(req)
-
-	if len(reqRes) > 0 {
-		req.URL.RawQuery = reqRes[0].(netUrl.Values).Encode()
-	}
-
-	r, err := http.DefaultClient.Do(req)
-	if err != nil {
-		return err
 	}
 
 	if len(reqRes) > 1 {

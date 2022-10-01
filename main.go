@@ -7,7 +7,6 @@ import (
 	"nerijusdu/release-button/internal/controls"
 	"nerijusdu/release-button/internal/releaser"
 	"nerijusdu/release-button/internal/web"
-	"os"
 
 	"github.com/joho/godotenv"
 )
@@ -29,14 +28,6 @@ func main() {
 	}
 
 	aApi := argoApi.NewArgoApi()
-	err = aApi.LoadToken(argoApi.AuthRequest{
-		Username: os.Getenv("ARGOCD_USERNAME"),
-		Password: os.Getenv("ARGOCD_PASSWORD"),
-	})
-	if err != nil {
-		fmt.Printf("Failed to fetch argo token. %v \n", err)
-	}
-
 	clickChan := make(chan string)
 	ioListener := controls.NewIOListener()
 	ioController := controls.NewIOController()

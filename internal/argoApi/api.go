@@ -9,10 +9,11 @@ import (
 )
 
 type ArgoApi struct {
-	token   string
-	baseUrl string
-	gToken  string
-	gUser   string
+	token      string
+	baseUrl    string
+	gToken     string
+	gUser      string
+	isNewToken bool
 }
 
 func NewArgoApi() *ArgoApi {
@@ -23,8 +24,17 @@ func NewArgoApi() *ArgoApi {
 	}
 }
 
-func (a *ArgoApi) LoadToken(req AuthRequest) error {
+func (a *ArgoApi) LoadToken() error {
+	if a.isNewToken {
+		return fmt.Errorf("Dont make infinite loops pls")
+	}
+
 	res := new(AuthResponse)
+	req := AuthRequest{
+		Username: os.Getenv("ARGOCD_USERNAME"),
+		Password: os.Getenv("ARGOCD_PASSWORD"),
+	}
+
 	err := a.postJson("/session", req, res)
 	if err != nil {
 		return err
