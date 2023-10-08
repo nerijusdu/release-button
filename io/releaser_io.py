@@ -8,10 +8,13 @@ pinMap = {
   "button_led": 18
 }
 ioMap = {}
+lcd = {}
 
 if dummy_io == False:
   from gpiozero import Button
   from gpiozero import LED
+  from RPLCD.i2c import CharLCD
+  lcd = CharLCD('PCF8574', 0x27)
   button_led = LED(pinMap['button_led'])
   button = Button(pinMap['release'])
   ioMap = {
@@ -71,3 +74,16 @@ def led_blink(id, onoff):
     thread.terminate()
     thread = None
     ioMap[id].off()
+
+def lcd_write(text):
+  if dummy_io:
+    return
+
+  lcd.clear()
+  lcd.write_string(text)
+
+def lcd_clear():
+  if dummy_io:
+    return
+
+  lcd.clear()
