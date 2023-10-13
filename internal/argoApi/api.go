@@ -26,7 +26,7 @@ func NewArgoApi() *ArgoApi {
 
 func (a *ArgoApi) LoadToken() error {
 	if a.isNewToken {
-		return fmt.Errorf("Dont make infinite loops pls")
+		return fmt.Errorf("dont make infinite loops pls")
 	}
 
 	res := new(AuthResponse)

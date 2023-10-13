@@ -113,3 +113,28 @@ def lcd_clear():
     lcd_thread = None
 
   lcd.clear()
+
+lcd_buffer = []
+lcd_buffer_thread = None
+
+def _lcd_push():
+  global lcd_buffer
+  global lcd_buffer_thread
+
+  while len(lcd_buffer) > 0:
+    lcd_write(lcd_buffer)
+    lcd_buffer.pop(0)
+    sleep(1)
+
+  lcd_buffer_thread.terminate()
+  lcd_buffer_thread = None
+
+def lcd_push(line):
+  if dummy_io:
+    return
+
+  lcd_buffer.append(line)
+
+  if lcd_buffer_thread == None:
+    lcd_buffer_thread = multiprocessing.Process(target=_lcd_push)
+    lcd_buffer_thread.start()

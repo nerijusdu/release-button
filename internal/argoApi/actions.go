@@ -59,7 +59,7 @@ func (a *ArgoApi) doRequest(req *http.Request, m, url string, reqRes []any) erro
 			fmt.Println("Unauthorized. Re-fetching token.")
 			err := a.LoadToken()
 			if err != nil {
-				return fmt.Errorf("Failed to fetch argo token. %v \n", err)
+				return fmt.Errorf("failed to fetch argo token. %v", err)
 			}
 
 			a.isNewToken = true
@@ -73,7 +73,7 @@ func (a *ArgoApi) doRequest(req *http.Request, m, url string, reqRes []any) erro
 			return a.postJson(url, reqRes...)
 		}
 
-		return fmt.Errorf("Request failed with status %s", r.Status)
+		return fmt.Errorf("request failed with status %s", r.Status)
 	}
 
 	if len(reqRes) > 1 {

@@ -1,4 +1,5 @@
 selectors:
-  environment: toolbox
-allowed: []
+  environment: staging
+allowed:
+- billo-frontend-service-staging
 refreshInterval: 30

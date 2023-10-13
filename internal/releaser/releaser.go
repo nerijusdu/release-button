@@ -39,6 +39,10 @@ func (r *Releaser) Listen(clickChan <-chan string) {
 			inSync, err := r.IsInSync()
 			if err != nil {
 				fmt.Printf("ERR: failed to check status. %v\n", err)
+				r.ioController.WriteToLCD([]string{
+					"Failed to check status",
+					err.Error(),
+				})
 			}
 			if !inSync {
 				err = r.ioController.TurnOnLed("button_led")
@@ -60,12 +64,17 @@ func (r *Releaser) Listen(clickChan <-chan string) {
 			err := r.Sync()
 			if err != nil {
 				fmt.Printf("ERR: failed to sync. %v", err)
+				r.ioController.WriteToLCD([]string{
+					"Oopsie woopsie",
+					err.Error(),
+				})
 			}
 		}
 	}
 }
 
 func (r *Releaser) Sync() error {
+	r.ioController.WriteToLCD([]string{"Vazhiojem..."})
 
 	apps, err := r.argoApi.GetApps(r.configs.Selectors, false)
 	if err != nil {
@@ -90,8 +99,10 @@ func (r *Releaser) Sync() error {
 			err = r.argoApi.Sync(app.Metadata.Name)
 			if err != nil {
 				fmt.Printf("ERR: Failed to sync %s. Error: %v\n", app.Metadata.Name, err)
+				r.ioController.PushToLcd(fmt.Sprintf("Failed to sync %s", app.Metadata.Name))
 			} else {
 				fmt.Println("Synced " + app.Metadata.Name)
+				r.ioController.PushToLcd(fmt.Sprintf("Synced %s", app.Metadata.Name))
 			}
 		}
 	}
@@ -102,6 +113,10 @@ func (r *Releaser) Sync() error {
 			inSync, err := r.IsInSync()
 			if err != nil {
 				fmt.Printf("ERR: failed to check status. %v\n", err)
+				r.ioController.WriteToLCD([]string{
+					"Failed to check status",
+					err.Error(),
+				})
 			}
 			if inSync {
 				err = r.ioController.BlinkLed("button_led", false)

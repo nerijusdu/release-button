@@ -31,6 +31,12 @@ def lcd_write():
   releaser_io.lcd_write(body['text'])
   return ""
 
+@app.route("/io/lcd/push", methods=['POST'])
+def lcd_push():
+  body = request.get_json()
+  releaser_io.lcd_push(body['text'])
+  return ""
+
 @app.route("/io/lcd/clear", methods=['POST'])
 def lcd_clear():
   releaser_io.lcd_clear()
