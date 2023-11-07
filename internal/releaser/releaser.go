@@ -61,7 +61,7 @@ func (r *Releaser) Listen(clickChan <-chan string) {
 	for button := range clickChan {
 		switch button {
 		case "release":
-			err := r.Sync()
+			err := r.Sync(nil)
 			if err != nil {
 				fmt.Printf("ERR: failed to sync. %v", err)
 				r.ioController.WriteToLCD([]string{
@@ -73,7 +73,7 @@ func (r *Releaser) Listen(clickChan <-chan string) {
 	}
 }
 
-func (r *Releaser) Sync() error {
+func (r *Releaser) Sync(index *int) error {
 	r.ioController.WriteToLCD([]string{"Vazhiojem..."})
 
 	apps, err := r.argoApi.GetApps(r.configs.Selectors, false)
@@ -88,7 +88,11 @@ func (r *Releaser) Sync() error {
 
 	r.isSyncing = true
 
-	for _, app := range apps.Items {
+	for i, app := range apps.Items {
+		if index != nil && *index != i+1 {
+			continue
+		}
+
 		if app.Status.Sync.Status == "OutOfSync" {
 			fmt.Println(app.Metadata.Name + " is out of sync")
 			if !util.Contains(r.configs.Allowed, app.Metadata.Name) {
@@ -104,6 +108,9 @@ func (r *Releaser) Sync() error {
 				fmt.Println("Synced " + app.Metadata.Name)
 				r.ioController.PushToLcd(fmt.Sprintf("Synced %s", app.Metadata.Name))
 			}
+		} else if index != nil {
+			fmt.Println("Already in sync")
+			r.ioController.PushToLcd(fmt.Sprintf("%s is already in sync", app.Metadata.Name))
 		}
 	}
 

@@ -23,10 +23,11 @@ export function TableSelection({ data, onSelectionChange, selection }: TableSele
     );
   const toggleAll = () => onSelectionChange(selection.length === data.length ? [] : data);
 
-  const rows = data.map((item) => {
+  const rows = data.map((item, i) => {
     const selected = selection.includes(item);
     return (
       <tr key={item} className={cx({ [classes.rowSelected]: selected })}>
+        <td>{i+1}</td>
         <td>
           <Checkbox
             checked={selection.includes(item)}
@@ -44,6 +45,7 @@ export function TableSelection({ data, onSelectionChange, selection }: TableSele
       <Table verticalSpacing="sm">
         <thead>
           <tr>
+            <th>#</th>
             <th style={{ width: 40 }}>
               <Checkbox
                 onChange={toggleAll}
