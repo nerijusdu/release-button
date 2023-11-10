@@ -160,3 +160,32 @@ func (r *Releaser) IsInSync() (bool, error) {
 
 	return true, nil
 }
+
+func (r *Releaser) SyncWithAudioConfirm(index int, cancelChan <-chan bool) {
+	apps, err := r.argoApi.GetApps(r.configs.Selectors, false)
+	if err != nil {
+		r.synth.Synthesize("Failed to get services")
+		return
+	}
+
+	if index > len(apps.Items) {
+		r.synth.Synthesize("Invalid index")
+		return
+	}
+
+	app := apps.Items[index-1]
+
+	r.synth.Synthesize(fmt.Sprintf("Releasing %s in 5 seconds", app.Metadata.Name))
+
+	select {
+	case <-time.After(5 * time.Second):
+		err = r.Sync(&index)
+		if err != nil {
+			r.synth.Synthesize("Failed to release")
+			return
+		}
+	case <-cancelChan:
+		r.synth.Synthesize("Cancelled")
+		return
+	}
+}
