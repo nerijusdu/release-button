@@ -3,6 +3,7 @@ package releaser
 import (
 	"fmt"
 	"nerijusdu/release-button/internal/argoApi"
+	"nerijusdu/release-button/internal/audio"
 	"nerijusdu/release-button/internal/config"
 	"nerijusdu/release-button/internal/controls"
 	"nerijusdu/release-button/internal/util"
@@ -12,6 +13,7 @@ import (
 type Releaser struct {
 	argoApi      argoApi.IArgoApi
 	ioController *controls.IOController
+	synth        *audio.Synth
 	configs      *config.Config
 	isSyncing    bool
 }
@@ -19,11 +21,13 @@ type Releaser struct {
 func NewReleaser(
 	aApi argoApi.IArgoApi,
 	ioController *controls.IOController,
+	synth *audio.Synth,
 	configs *config.Config,
 ) *Releaser {
 	return &Releaser{
 		argoApi:      aApi,
 		ioController: ioController,
+		synth:        synth,
 		configs:      configs,
 	}
 }
@@ -75,6 +79,7 @@ func (r *Releaser) Listen(clickChan <-chan string) {
 
 func (r *Releaser) Sync(index *int) error {
 	r.ioController.WriteToLCD([]string{"Vazhiojem..."})
+	r.synth.Synthesize("Vahzioyam")
 
 	apps, err := r.argoApi.GetApps(r.configs.Selectors, false)
 	if err != nil {
