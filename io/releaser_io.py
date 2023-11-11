@@ -1,30 +1,39 @@
 from time import sleep
 import multiprocessing
 import os
+import keypad_io
 
 dummy_io = os.environ.get('DUMMY_IO') == 'true'
+disable_lcd = os.environ.get('DISABLE_LCD') == 'true'
+disable_button = os.environ.get('DISABLE_BUTTON') == 'true'
+disable_button_led = os.environ.get('DISABLE_BUTTON_LED') == 'true'
+
 pinMap = {
   "release": 4,
   "button_led": 18
 }
-ioMap = {}
+ioMap = {
+  "release": None,
+  "button_led": None
+}
 lcd = {}
 
 if dummy_io == False:
-  from gpiozero import Button
-  from gpiozero import LED
-  from RPLCD.i2c import CharLCD
-  lcd = CharLCD('PCF8574', 0x27, auto_linebreaks=False)
-  button_led = LED(pinMap['button_led'])
-  button = Button(pinMap['release'])
-  ioMap = {
-    "release": button,
-    "button_led": button_led
-  }
+  if disable_lcd == False:
+    from RPLCD.i2c import CharLCD
+    lcd = CharLCD('PCF8574', 0x27, auto_linebreaks=False)
+  if disable_button_led == False:
+    from gpiozero import LED
+    button_led = LED(pinMap['button_led'])
+    ioMap.button_led = button_led
+  if disable_button == False:
+    from gpiozero import Button
+    button = Button(pinMap['release'])
+    ioMap.release = button
 
 
 def listen_to_button(id, listener):
-  if dummy_io:
+  if dummy_io or disable_button:
     return
 
   if id in ioMap.keys():
@@ -138,3 +147,24 @@ def lcd_push(line):
   if lcd_buffer_thread == None:
     lcd_buffer_thread = multiprocessing.Process(target=_lcd_push)
     lcd_buffer_thread.start()
+
+keypad_thread = None
+
+def keypad_toggle(on):
+  global keypad_thread
+
+  if dummy_io:
+    return
+
+  if on == True:
+    if keypad_thread != None:
+      return
+
+    keypad_thread = multiprocessing.Process(target=keypad_io.listen_to_keypad)
+    keypad_thread.start()
+  else:
+    if keypad_thread == None:
+      return
+
+    keypad_thread.terminate()
+    keypad_thread = None

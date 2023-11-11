@@ -42,6 +42,12 @@ def lcd_clear():
   releaser_io.lcd_clear()
   return ""
 
+@app.route("/io/keypad", methods=['POST'])
+def keypad_toggle():
+  body = request.get_json()
+  releaser_io.keypad_toggle(body['on'])
+  return ""
+
 def start():
   print("Running IO controller on port :6968")
   app.run(host='0.0.0.0', port=6968)
