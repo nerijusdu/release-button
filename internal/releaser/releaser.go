@@ -10,12 +10,10 @@ import (
 )
 
 type Releaser struct {
-	argoApi             argoApi.IArgoApi
-	ioController        *controls.IOController
-	configs             *config.Config
-	isSyncing           bool
-	numInput            string
-	numInputTimerCloser func()
+	argoApi      argoApi.IArgoApi
+	ioController *controls.IOController
+	configs      *config.Config
+	isSyncing    bool
 }
 
 func NewReleaser(
@@ -30,7 +28,7 @@ func NewReleaser(
 	}
 }
 
-func (r *Releaser) Listen(clickChan <-chan string) {
+func (r *Releaser) Listen(clickChan <-chan controls.Action) {
 	util.Schedule(
 		time.Duration(r.configs.RefreshInterval)*time.Second,
 		r.checkIfNeedsSyncing,
@@ -89,16 +87,16 @@ func (r *Releaser) Sync(index *int) error {
 	return nil
 }
 
-func (r *Releaser) SyncWithAudioConfirm(index int, cancelChan <-chan bool) {
+func (r *Releaser) SyncWithAudioConfirm(index int, cancelChan <-chan bool) error {
 	apps, err := r.argoApi.GetApps(r.configs.Selectors, false)
 	if err != nil {
 		r.ioController.Speak("Failed to get services")
-		return
+		return err
 	}
 
 	if index > len(apps.Items) {
 		r.ioController.Speak("Invalid index")
-		return
+		return err
 	}
 
 	app := apps.Items[index-1]
@@ -110,10 +108,13 @@ func (r *Releaser) SyncWithAudioConfirm(index int, cancelChan <-chan bool) {
 		err = r.Sync(&index)
 		if err != nil {
 			r.ioController.Speak("Failed to release")
-			return
+			return err
 		}
 	case <-cancelChan:
 		r.ioController.Speak("Cancelled")
-		return
+		fmt.Println("Sync with audio cancelled")
+		return nil
 	}
+
+	return nil
 }

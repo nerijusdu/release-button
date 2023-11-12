@@ -28,7 +28,7 @@ func main() {
 	}
 
 	aApi := argoApi.NewArgoApi()
-	clickChan := make(chan string)
+	clickChan := make(chan controls.Action)
 	ioListener := controls.NewIOListener()
 	ioController := controls.NewIOController()
 	releaser := releaser.NewReleaser(aApi, ioController, c)

@@ -2,36 +2,22 @@ package releaser
 
 import (
 	"fmt"
-	"nerijusdu/release-button/internal/util"
-	"strconv"
-	"time"
+	"nerijusdu/release-button/internal/controls"
 )
 
-func (r *Releaser) handleButtonClick(clickChan <-chan string) {
+func (r *Releaser) handleButtonClick(clickChan <-chan controls.Action) {
 	cancelChan := make(chan bool, 1)
-	cancelTimer := func() {
-		if r.numInputTimerCloser != nil {
-			r.numInputTimerCloser()
-			r.numInputTimerCloser = nil
-		}
-	}
 
-	resetTimer := func() {
-		cancelTimer()
-		r.numInputTimerCloser = util.Schedule(3*time.Second, func() {
-			parsedNum, err := strconv.Atoi(r.numInput)
-			if err != nil {
-				fmt.Printf("ERR: failed to parse input: %s. %v", r.numInput, err)
-				return
-			}
-			r.SyncWithAudioConfirm(parsedNum, cancelChan)
-		})
-	}
-
-	for button := range clickChan {
-		switch button {
+	for a := range clickChan {
+		switch a.Action {
 		case "release":
-			err := r.Sync(nil)
+			var err error
+			if a.Data.Number == 0 {
+				err = r.Sync(nil)
+			} else {
+				err = r.SyncWithAudioConfirm(a.Data.Number, cancelChan)
+			}
+
 			if err != nil {
 				fmt.Printf("ERR: failed to sync. %v", err)
 				r.ioController.WriteToLCD([]string{
@@ -39,20 +25,10 @@ func (r *Releaser) handleButtonClick(clickChan <-chan string) {
 					err.Error(),
 				})
 			}
-		case "1", "2", "3", "4", "5", "6", "7", "8", "9", "0":
-			fmt.Printf("Syncing %s\n", button)
-			r.numInput += button
-			resetTimer()
-		case "Redial", "Cancel":
-			r.numInput = ""
+		case "cancel":
 			fmt.Println("Cancelling")
 			cancelChan <- true
 			fmt.Println("Cancelled")
-			cancelChan = make(chan bool, 1)
-			cancelTimer()
-		case "R":
-			r.numInput = r.numInput[:len(r.numInput)-1]
-			resetTimer()
 		}
 	}
 }

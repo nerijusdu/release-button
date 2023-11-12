@@ -1,5 +1,6 @@
 import RPi.GPIO as GPIO
 from time import sleep
+from threading import Timer
 
 GPIO.setmode(GPIO.BCM)
 
@@ -28,10 +29,43 @@ buttons = {
 buttonKeys = list(buttons.keys())
 
 onNumberEntered = None
+numberInput = ''
+numberInputTimer = None
 
 def setup(numberEnteredHandler):
   global onNumberEntered
   onNumberEntered = numberEnteredHandler
+
+def on_clicked(key):
+  global numberInput
+  global numberInputTimer
+  global onNumberEntered
+
+  def clearTimer():
+    global numberInputTimer
+    if numberInputTimer is not None:
+      numberInputTimer.cancel()
+      numberInputTimer = None
+
+  def resetTimer():
+    global numberInputTimer
+    clearTimer()
+    numberInputTimer = Timer(3, lambda: onNumberEntered(numberInput))
+    numberInputTimer.start()
+
+  if key == 'Redial':
+    numberInput = ''
+    clearTimer()
+  elif key == 'R':
+    numberInput = numberInput[:-1]
+    resetTimer()
+  elif key == '#':
+    print('dont know what to do with #')
+  elif key == '*':
+    print('dont know what to do with *')
+  else:
+    numberInput += key
+    resetTimer()
 
 def listen_to_keypad():
   global onNumberEntered
@@ -42,7 +76,7 @@ def listen_to_keypad():
       GPIO.setup(buttons[key][1], GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
       GPIO.output(buttons[key][0], GPIO.HIGH)
       if GPIO.input(buttons[key][1]) == GPIO.HIGH:
-        onNumberEntered(str(key))
+        on_clicked(str(key))
         sleep(0.7) # avoid long press triggering multiple times
       GPIO.cleanup(buttons[key])
     sleep(0.1)

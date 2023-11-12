@@ -12,11 +12,14 @@ import keypad_io
 url = os.environ.get('RELEASER_URL')
 
 def notify_releaser():
-  requests.post(url+'/io/buttons/release')
+  requests.post(url+'/io/actions/release')
 
 def notify_keypad(num):
-  requests.post(url+'/io/buttons/'+num)
-  print('clicked: '+num)
+  requests.post(url+'/io/actions/release', json={'number': num})
+
+def putdown():
+  releaser_io.keypad_toggle(False)
+  requests.post(url+'/io/actions/cancel')
 
 def sigintHandler(signal_number, frame):
   print('Exiting')
@@ -24,7 +27,7 @@ def sigintHandler(signal_number, frame):
 
 releaser_io.listen_to_button("release", notify_releaser)
 releaser_io.listen_to_button("phone-pickup", lambda: releaser_io.keypad_toggle(True))
-releaser_io.listen_to_button("phone-putdown", lambda: releaser_io.keypad_toggle(False))
+releaser_io.listen_to_button("phone-putdown", putdown)
 keypad_io.setup(notify_keypad)
 
 signal.signal(signal.SIGINT, sigintHandler)

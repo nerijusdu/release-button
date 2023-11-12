@@ -59,4 +59,3 @@ func ScheduleControlled(interval time.Duration, handler func() bool) {
 		}
 	}()
 }
-
