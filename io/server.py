@@ -23,6 +23,8 @@ def sigintHandler(signal_number, frame):
   sys.exit()
 
 releaser_io.listen_to_button("release", notify_releaser)
+releaser_io.listen_to_button("phone-pickup", lambda: releaser_io.keypad_toggle(True))
+releaser_io.listen_to_button("phone-putdown", lambda: releaser_io.keypad_toggle(False))
 keypad_io.setup(notify_keypad)
 
 signal.signal(signal.SIGINT, sigintHandler)

@@ -1,10 +1,12 @@
 import RPi.GPIO as GPIO
 from time import sleep
 
-GPIO.setmode(GPIO.BOARD)
+GPIO.setmode(GPIO.BCM)
 
-pins1 = [40,38,36,32,26,24]
-pins2 = [23,29,31,33,35,37]
+# pins1 = [40,38,36,32,26,24] # Board
+pins1 = [21,20,16,12,7,8] #BCM
+# pins2 = [23,29,31,33,35,37] # Board
+pins2 = [11,5,6,13,19,26] # BCM
 
 buttons = {
   1: [pins1[2], pins2[4]],
