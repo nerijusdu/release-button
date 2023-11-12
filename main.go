@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"nerijusdu/release-button/internal/argoApi"
-	"nerijusdu/release-button/internal/audio"
 	"nerijusdu/release-button/internal/config"
 	"nerijusdu/release-button/internal/controls"
 	"nerijusdu/release-button/internal/releaser"
@@ -32,8 +31,7 @@ func main() {
 	clickChan := make(chan string)
 	ioListener := controls.NewIOListener()
 	ioController := controls.NewIOController()
-	synth := audio.NewSynth()
-	releaser := releaser.NewReleaser(aApi, ioController, synth, c)
+	releaser := releaser.NewReleaser(aApi, ioController, c)
 	webApi := web.NewWebApi(aApi, c)
 
 	go webApi.Listen()

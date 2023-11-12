@@ -3,7 +3,6 @@ package releaser
 import (
 	"fmt"
 	"nerijusdu/release-button/internal/argoApi"
-	"nerijusdu/release-button/internal/audio"
 	"nerijusdu/release-button/internal/config"
 	"nerijusdu/release-button/internal/controls"
 	"nerijusdu/release-button/internal/util"
@@ -11,23 +10,22 @@ import (
 )
 
 type Releaser struct {
-	argoApi      argoApi.IArgoApi
-	ioController *controls.IOController
-	synth        *audio.Synth
-	configs      *config.Config
-	isSyncing    bool
+	argoApi             argoApi.IArgoApi
+	ioController        *controls.IOController
+	configs             *config.Config
+	isSyncing           bool
+	numInput            string
+	numInputTimerCloser func()
 }
 
 func NewReleaser(
 	aApi argoApi.IArgoApi,
 	ioController *controls.IOController,
-	synth *audio.Synth,
 	configs *config.Config,
 ) *Releaser {
 	return &Releaser{
 		argoApi:      aApi,
 		ioController: ioController,
-		synth:        synth,
 		configs:      configs,
 	}
 }
@@ -35,51 +33,15 @@ func NewReleaser(
 func (r *Releaser) Listen(clickChan <-chan string) {
 	util.Schedule(
 		time.Duration(r.configs.RefreshInterval)*time.Second,
-		func() {
-			if r.isSyncing {
-				return
-			}
-
-			inSync, err := r.IsInSync()
-			if err != nil {
-				fmt.Printf("ERR: failed to check status. %v\n", err)
-				r.ioController.WriteToLCD([]string{
-					"Failed to check status",
-					err.Error(),
-				})
-			}
-			if !inSync {
-				err = r.ioController.TurnOnLed("button_led")
-				if err != nil {
-					fmt.Printf("ERR: turn on led. %v\n", err)
-				}
-			} else {
-				err = r.ioController.TurnOffLed("button_led")
-				if err != nil {
-					fmt.Printf("ERR: turn off led. %v\n", err)
-				}
-			}
-		},
+		r.checkIfNeedsSyncing,
 	)
 
-	for button := range clickChan {
-		switch button {
-		case "release":
-			err := r.Sync(nil)
-			if err != nil {
-				fmt.Printf("ERR: failed to sync. %v", err)
-				r.ioController.WriteToLCD([]string{
-					"Oopsie woopsie",
-					err.Error(),
-				})
-			}
-		}
-	}
+	r.handleButtonClick(clickChan)
 }
 
 func (r *Releaser) Sync(index *int) error {
 	r.ioController.WriteToLCD([]string{"Vazhiojem..."})
-	r.synth.Synthesize("Vahzioyam")
+	r.ioController.Speak("Vahzioyam")
 
 	apps, err := r.argoApi.GetApps(r.configs.Selectors, false)
 	if err != nil {
@@ -121,71 +83,37 @@ func (r *Releaser) Sync(index *int) error {
 
 	util.ScheduleControlled(
 		5*time.Second,
-		func() bool {
-			inSync, err := r.IsInSync()
-			if err != nil {
-				fmt.Printf("ERR: failed to check status. %v\n", err)
-				r.ioController.WriteToLCD([]string{
-					"Failed to check status",
-					err.Error(),
-				})
-			}
-			if inSync {
-				err = r.ioController.BlinkLed("button_led", false)
-				if err != nil {
-					fmt.Printf("ERR: failed to turn off led. %v", err)
-				}
-				r.isSyncing = false
-				return true
-			}
-			return false
-		},
+		r.updateSyncProgress,
 	)
 
 	return nil
 }
 
-func (r *Releaser) IsInSync() (bool, error) {
-	apps, err := r.argoApi.GetApps(r.configs.Selectors, true)
-	if err != nil {
-		return true, err
-	}
-
-	for _, app := range apps.Items {
-		if app.Status.Sync.Status == "OutOfSync" &&
-			util.Contains(r.configs.Allowed, app.Metadata.Name) {
-			return false, nil
-		}
-	}
-
-	return true, nil
-}
-
 func (r *Releaser) SyncWithAudioConfirm(index int, cancelChan <-chan bool) {
 	apps, err := r.argoApi.GetApps(r.configs.Selectors, false)
 	if err != nil {
-		r.synth.Synthesize("Failed to get services")
+		r.ioController.Speak("Failed to get services")
 		return
 	}
 
 	if index > len(apps.Items) {
-		r.synth.Synthesize("Invalid index")
+		r.ioController.Speak("Invalid index")
 		return
 	}
 
 	app := apps.Items[index-1]
 
-	r.synth.Synthesize(fmt.Sprintf("Releasing %s in 5 seconds", app.Metadata.Name))
+	r.ioController.Speak(fmt.Sprintf("Releasing %s in 5 seconds", app.Metadata.Name))
 
 	select {
 	case <-time.After(5 * time.Second):
 		err = r.Sync(&index)
 		if err != nil {
-			r.synth.Synthesize("Failed to release")
+			r.ioController.Speak("Failed to release")
 			return
 		}
 	case <-cancelChan:
-		r.synth.Synthesize("Cancelled")
+		r.ioController.Speak("Cancelled")
 		return
 	}
 }

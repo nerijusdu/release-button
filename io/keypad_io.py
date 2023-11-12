@@ -27,14 +27,14 @@ buttons = {
 
 buttonKeys = list(buttons.keys())
 
-onClickHandler = None
+onNumberEntered = None
 
-def setup(onClick):
-  global onClickHandler
-  onClickHandler = onClick
+def setup(numberEnteredHandler):
+  global onNumberEntered
+  onNumberEntered = numberEnteredHandler
 
 def listen_to_keypad():
-  global onClickHandler
+  global onNumberEntered
 
   while True:
     for key in buttonKeys:
@@ -42,7 +42,7 @@ def listen_to_keypad():
       GPIO.setup(buttons[key][1], GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
       GPIO.output(buttons[key][0], GPIO.HIGH)
       if GPIO.input(buttons[key][1]) == GPIO.HIGH:
-        onClickHandler(str(key))
-        sleep(0.5)
+        onNumberEntered(str(key))
+        sleep(0.7) # avoid long press triggering multiple times
       GPIO.cleanup(buttons[key])
-    sleep(0.2)
+    sleep(0.1)

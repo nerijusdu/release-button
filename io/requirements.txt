@@ -2,3 +2,5 @@ Flask==2.2.2
 gpiozero==1.6.2
 python-dotenv==0.21.0
 waitress==2.1.2
+pyaudio==0.2.14
+boto3==1.28.84

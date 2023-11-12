@@ -63,3 +63,17 @@ func (c *IOController) PushToLcd(line string) error {
 	_, err = http.Post(c.url+"/io/lcd/push", "application/json", bytes.NewReader(data))
 	return err
 }
+
+type speakRequest struct {
+	Text string `json:"text"`
+}
+
+func (c *IOController) Speak(text string) error {
+	data, err := json.Marshal(&speakRequest{Text: text})
+	if err != nil {
+		return err
+	}
+
+	_, err = http.Post(c.url+"/io/synth", "application/json", bytes.NewReader(data))
+	return err
+}

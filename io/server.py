@@ -14,9 +14,9 @@ url = os.environ.get('RELEASER_URL')
 def notify_releaser():
   requests.post(url+'/io/buttons/release')
 
-def notify_keypad(key):
-  # requests.post(url+'/io/keypad/'+key)
-  print('clicked: '+key)
+def notify_keypad(num):
+  requests.post(url+'/io/buttons/'+num)
+  print('clicked: '+num)
 
 def sigintHandler(signal_number, frame):
   print('Exiting')

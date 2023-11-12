@@ -2,6 +2,7 @@ import io
 from flask import Flask
 from flask import request
 import releaser_io
+import synth_io
 
 app = Flask(__name__)
 
@@ -46,6 +47,12 @@ def lcd_clear():
 def keypad_toggle():
   body = request.get_json()
   releaser_io.keypad_toggle(body['on'])
+  return ""
+
+@app.route("/io/synth", methods=['POST'])
+def synth():
+  body = request.get_json()
+  synth_io.synthesize_speech(body['text'])
   return ""
 
 def start():
