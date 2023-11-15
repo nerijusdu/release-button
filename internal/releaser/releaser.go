@@ -40,6 +40,7 @@ func (r *Releaser) Listen(clickChan <-chan controls.Action) {
 func (r *Releaser) Sync(index *int) error {
 	r.ioController.WriteToLCD([]string{"Vazhiojem..."})
 	r.ioController.Speak("Vahzioyam")
+	time.Sleep(1 * time.Second)
 
 	apps, err := r.argoApi.GetApps(r.configs.Selectors, false)
 	if err != nil {
@@ -72,10 +73,14 @@ func (r *Releaser) Sync(index *int) error {
 			} else {
 				fmt.Println("Synced " + app.Metadata.Name)
 				r.ioController.PushToLcd(fmt.Sprintf("Synced %s", app.Metadata.Name))
+				if index != nil {
+					r.ioController.Speak("Synced successfully")
+				}
 			}
 		} else if index != nil {
 			fmt.Println("Already in sync")
 			r.ioController.PushToLcd(fmt.Sprintf("%s is already in sync", app.Metadata.Name))
+			r.ioController.Speak("Service is already in sync")
 		}
 	}
 
@@ -105,7 +110,8 @@ func (r *Releaser) SyncWithAudioConfirm(index int, cancelChan <-chan bool) error
 	r.ioController.Speak(fmt.Sprintf("Releasing %s in 5 seconds", app.Metadata.Name))
 
 	select {
-	case <-time.After(5 * time.Second):
+	// 7 because it takes some time to speak
+	case <-time.After(7 * time.Second):
 		err = r.Sync(&index)
 		if err != nil {
 			r.ioController.Speak("Failed to release")

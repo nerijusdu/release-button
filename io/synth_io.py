@@ -1,3 +1,4 @@
+import multiprocessing
 import boto3
 from ctypes import *
 from contextlib import contextmanager
@@ -32,20 +33,21 @@ with noalsaerr():
 
 # multiple requests throws an error, device is busy
 
-def synthesize_speech(text):
+synth_thread = None
+
+def _synthesize(text):
+  global synth_thread
   print('synthesizing speech')
   stream = p.open(format=p.get_format_from_width(2),
     channels=1,
     rate=16000,
     output=True)
-  print('stream opened')
 
   response = polly_client.synthesize_speech(VoiceId='Stephen',
     OutputFormat='pcm', 
     Text = text,
     Engine = 'neural',
     SampleRate = '16000')
-  print('response received')
 
   with closing(response["AudioStream"]) as polly_stream:
     while True:
@@ -53,10 +55,21 @@ def synthesize_speech(text):
       if data is None or len(data) == 0:
         break
       stream.write(data)
-  print('stream closed')
 
   stream.stop_stream()
   stream.close()
+  print('done synthesizing speech')
+
+def synthesize_speech(text):
+  global synth_thread
+
+  if synth_thread != None:
+    synth_thread.terminate()
+    synth_thread = None
+
+  synth_thread = multiprocessing.Process(target=_synthesize, args=(text,))
+  synth_thread.start()
+
 
 def cleanup():
   p.terminate()
