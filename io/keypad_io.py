@@ -29,36 +29,53 @@ buttons = {
 buttonKeys = list(buttons.keys())
 
 onNumberEntered = None
+onCancel = None
+
 numberInput = ''
 numberInputTimer = None
 
-def setup(numberEnteredHandler):
+def setup(numberEnteredHandler, cancelHandler):
   global onNumberEntered
+  global onCancel
   onNumberEntered = numberEnteredHandler
+  onCancel = cancelHandler
+
+def clearTimer():
+  global numberInputTimer
+  if numberInputTimer is not None:
+    numberInputTimer.cancel()
+    numberInputTimer = None
+
+def sendNumber():
+  global numberInput
+  global onNumberEntered
+  if numberInput != '':
+    onNumberEntered(numberInput)
+    numberInput = ''
+    clearTimer()
+
+def resetTimer():
+  global numberInputTimer
+  clearTimer()
+  numberInputTimer = Timer(3, sendNumber)
+  numberInputTimer.start()
+
 
 def on_clicked(key):
   global numberInput
   global numberInputTimer
   global onNumberEntered
+  global onCancel
 
-  def clearTimer():
-    global numberInputTimer
-    if numberInputTimer is not None:
-      numberInputTimer.cancel()
-      numberInputTimer = None
-
-  def resetTimer():
-    global numberInputTimer
-    clearTimer()
-    numberInputTimer = Timer(3, lambda: onNumberEntered(numberInput))
-    numberInputTimer.start()
+  print('current number: ', numberInput, ' key pressed: ', key)
 
   if key == 'Redial':
     numberInput = ''
     clearTimer()
   elif key == 'R':
-    numberInput = numberInput[:-1]
+    numberInput = ''
     resetTimer()
+    onCancel()
   elif key == '#':
     print('dont know what to do with #')
   elif key == '*':

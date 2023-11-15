@@ -17,6 +17,10 @@ build:
 	cp io/requirements.txt dist/io/
 	cp Makefile dist/
 
+build-pi:
+	go build
+	mv release-button ~/bin/
+
 prep:
 	cd io && pip install -r requirements.txt
 

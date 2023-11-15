@@ -26,7 +26,7 @@ def _lcd_write(line, line_num):
 def lcd_write(lines):
   global lcd_thread
 
-  if dummy_io:
+  if dummy_io or disable_lcd:
     return
 
   lcd_clear()
@@ -42,7 +42,7 @@ def lcd_write(lines):
 def lcd_clear():
   global lcd_thread
 
-  if dummy_io:
+  if dummy_io or disable_lcd:
     return
 
   if lcd_thread != None:
@@ -67,7 +67,7 @@ def _lcd_push():
   lcd_buffer_thread = None
 
 def lcd_push(line):
-  if dummy_io:
+  if dummy_io or disable_lcd:
     return
 
   lcd_buffer.append(line)

@@ -40,17 +40,21 @@ func (c *IOListener) Listen(clickChan chan<- Action) {
 			w.WriteHeader(http.StatusBadRequest)
 		}
 
-		err = json.Unmarshal(bodyBytes, &d)
-		if err != nil {
-			fmt.Printf("ERR: failed to unmarshal body. %v", err)
-			w.WriteHeader(http.StatusBadRequest)
+		if len(bodyBytes) != 0 {
+			err = json.Unmarshal(bodyBytes, &d)
+			if err != nil {
+				fmt.Printf("ERR: failed to unmarshal body. %v", err)
+				w.WriteHeader(http.StatusBadRequest)
+			}
 		}
 
 		a := Action{
 			Action: chi.URLParam(r, "action"),
 			Data:   d,
 		}
+
 		clickChan <- a
+
 		w.WriteHeader(http.StatusOK)
 	})
 

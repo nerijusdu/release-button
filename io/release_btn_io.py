@@ -32,14 +32,14 @@ def listen_to_button(id, listener):
     ioMap[id].when_pressed = listener
 
 def led_on(id):
-  if dummy_io:
+  if dummy_io or disable_button:
     return
 
   if id in ioMap.keys():
     ioMap[id].on()
 
 def led_off(id):
-  if dummy_io:
+  if dummy_io or disable_button:
     return
 
   if id in ioMap.keys():
@@ -58,7 +58,7 @@ def _led_blink(id):
 thread = None
 
 def led_blink(id, onoff):
-  if dummy_io:
+  if dummy_io or disable_button:
     return
 
   global thread

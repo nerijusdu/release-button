@@ -187,7 +187,8 @@
           "disableTemplating": false,
           "fallbackTo404": false,
           "default": false,
-          "crudKey": "id"
+          "crudKey": "id",
+          "body": "{}"
         }
       ],
       "enabled": true,

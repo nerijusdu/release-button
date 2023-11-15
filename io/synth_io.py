@@ -30,6 +30,8 @@ polly_client = boto3.Session(
 with noalsaerr():
   p = pyaudio.PyAudio()
 
+# multiple requests throws an error, device is busy
+
 def synthesize_speech(text):
   print('synthesizing speech')
   stream = p.open(format=p.get_format_from_width(2),

@@ -6,29 +6,34 @@ import (
 )
 
 func (r *Releaser) handleButtonClick(clickChan <-chan controls.Action) {
-	cancelChan := make(chan bool, 1)
+	cancelChan := make(chan bool)
 
 	for a := range clickChan {
 		switch a.Action {
 		case "release":
-			var err error
-			if a.Data.Number == 0 {
-				err = r.Sync(nil)
-			} else {
-				err = r.SyncWithAudioConfirm(a.Data.Number, cancelChan)
-			}
+			go func(action controls.Action) {
+				fmt.Printf("Releasing %d \n", action.Data.Number)
+				var err error
+				if action.Data.Number == 0 {
+					err = r.Sync(nil)
+				} else {
+					cancelChan = make(chan bool)
+					err = r.SyncWithAudioConfirm(action.Data.Number, cancelChan)
+				}
 
-			if err != nil {
-				fmt.Printf("ERR: failed to sync. %v", err)
-				r.ioController.WriteToLCD([]string{
-					"Oopsie woopsie",
-					err.Error(),
-				})
-			}
+				if err != nil {
+					fmt.Printf("ERR: failed to sync. %v", err)
+					r.ioController.WriteToLCD([]string{
+						"Oopsie woopsie",
+						err.Error(),
+					})
+				}
+			}(a)
 		case "cancel":
-			fmt.Println("Cancelling")
-			cancelChan <- true
-			fmt.Println("Cancelled")
+			go func() {
+				fmt.Println("Cancelling")
+				cancelChan <- true
+			}()
 		}
 	}
 }

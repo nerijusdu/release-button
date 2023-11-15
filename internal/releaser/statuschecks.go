@@ -39,6 +39,7 @@ func (r *Releaser) updateSyncProgress() bool {
 			"Failed to check status",
 			err.Error(),
 		})
+		return false
 	}
 	if inSync {
 		err = r.ioController.BlinkLed("button_led", false)

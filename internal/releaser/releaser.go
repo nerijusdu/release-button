@@ -79,10 +79,10 @@ func (r *Releaser) Sync(index *int) error {
 		}
 	}
 
-	util.ScheduleControlled(
-		5*time.Second,
-		r.updateSyncProgress,
-	)
+	// util.ScheduleControlled(
+	// 	5*time.Second,
+	// 	r.updateSyncProgress,
+	// )
 
 	return nil
 }
@@ -94,7 +94,8 @@ func (r *Releaser) SyncWithAudioConfirm(index int, cancelChan <-chan bool) error
 		return err
 	}
 
-	if index > len(apps.Items) {
+	var length int = len(apps.Items)
+	if index > length {
 		r.ioController.Speak("Invalid index")
 		return err
 	}
