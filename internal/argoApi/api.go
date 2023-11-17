@@ -1,6 +1,7 @@
 package argoApi
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/url"
 	"os"
@@ -44,8 +45,31 @@ func (a *ArgoApi) LoadToken() error {
 	return nil
 }
 
+type SyncResponseDetails struct {
+	TypeUrl string `json:"type_url"`
+	Value   string `json:"value"`
+}
+
+type SyncResponse struct {
+	Code     int                 `json:"code"`
+	Error    string              `json:"error"`
+	Message  string              `json:"message"`
+	Details  SyncResponseDetails `json:"details"`
+	Metadata AppMeta             `json:"metadata"`
+	Status   AppStatus           `json:"status"`
+}
+
+func prettyPrint(i interface{}) string {
+	s, _ := json.MarshalIndent(i, "", "\t")
+	return string(s)
+}
+
 func (a *ArgoApi) Sync(name string) error {
-	return a.postJson("/applications/" + name + "/sync")
+	var res SyncResponse
+	err := a.postJson("/applications/"+name+"/sync", nil, &res)
+	fmt.Println(prettyPrint(res))
+
+	return err
 }
 
 func (a *ArgoApi) GetApps(selectors map[string]string, refresh bool) (*Applications, error) {

@@ -59,7 +59,7 @@ func (r *Releaser) Sync(index *int) error {
 			continue
 		}
 
-		if app.Status.Sync.Status == "OutOfSync" {
+		if app.Status.Sync.Status == "OutOfSync" || app.Status.Sync.Status == "Unknown" {
 			fmt.Println(app.Metadata.Name + " is out of sync")
 			if !util.Contains(r.configs.Allowed, app.Metadata.Name) {
 				fmt.Println("Skipping")
